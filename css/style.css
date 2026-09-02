@@ -12,9 +12,11 @@
   --cream-deep:   #F3EBE1;
   --sand:         #E9DCCA;
   --sand-deep:    #DCCAB2;
+  --card:         #EFE6D7;   /* warmes Beige für Karten – hebt sich von Creme ab */
   --gold:         #C0A06A;
   --gold-light:   #DCC49A;
   --gold-deep:    #A3854E;
+  --gold-ink:     #83642F;   /* kräftigeres Gold für Text auf hellem Grund */
   --espresso:     #33281F;
   --espresso-deep:#241C15;
   --ink:          #463A30;
@@ -493,9 +495,9 @@ p:last-child { margin-bottom: 0; }
 }
 .service-card {
   display: flex; flex-direction: column; text-align: center;
-  background: var(--white);
+  background: var(--card);
   padding: 0 0 2.25rem;
-  border: 1px solid var(--line-soft);
+  border: 1px solid var(--line-gold);
   transition: transform .55s var(--ease), box-shadow .55s var(--ease), border-color .55s var(--ease);
 }
 .service-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-card); border-color: var(--line-gold); }
@@ -510,6 +512,47 @@ p:last-child { margin-bottom: 0; }
 .service-card p { color: var(--muted); font-size: .95rem; margin-top: 1.1rem; }
 .service-card .btn { margin-top: auto; align-self: center; }
 .service-card__foot { padding-top: 1.75rem; margin-top: auto; }
+
+/* 8.1b Verzweigung: drei Linien führen von der Überschrift zu den drei Karten
+   und "verbinden" sich beim Scrollen mit je einem Punkt am Kartenanfang */
+.section-head--branch { margin-bottom: .5rem; }
+.branch {
+  position: relative;
+  width: 100%;
+  height: clamp(66px, 9vw, 104px);
+  margin-bottom: 0;
+}
+.branch__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.branch__path {
+  fill: none;
+  stroke: var(--line-gold);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dashoffset: 9999;                /* dasharray + offset werden per JS gesetzt */
+  transition: stroke-dashoffset .18s linear, stroke .4s var(--ease);
+}
+.branch.is-linked .branch__path { stroke: var(--gold); }
+.branch__dot {
+  position: absolute;
+  left: var(--x, 50%); bottom: -5px;
+  width: 9px; height: 9px; margin-left: -4.5px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 1.5px solid var(--line-gold);
+  opacity: 0; transform: scale(.35);
+  transition: opacity .35s var(--ease), transform .35s var(--ease),
+              background-color .35s var(--ease), border-color .35s var(--ease);
+}
+.branch.is-linked .branch__dot {
+  opacity: 1; transform: scale(1);
+  background: var(--gold); border-color: var(--gold-light);
+}
+/* Tablet/Handy: Karten untereinander – nur eine gerade Linie mit einem Punkt */
+.branch--stack { height: clamp(44px, 8vw, 72px); }
+.branch--stack .branch__path { display: none; }
+.branch--stack .branch__path:first-of-type { display: block; }
+.branch--stack .branch__dot { display: none; }
+.branch--stack .branch__dot:nth-of-type(2) { display: block; }
 
 /* 8.2 Split (Bild + Text) */
 .split {
@@ -671,23 +714,42 @@ p:last-child { margin-bottom: 0; }
   padding-bottom: 1.1rem; margin-bottom: .5rem;
   border-bottom: 1px solid var(--line);
 }
-.price-block__head h3 { text-transform: uppercase; letter-spacing: .14em; font-size: clamp(1.1rem, 1.4vw, 1.4rem); }
-.price-block__note { margin-left: auto; font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.price-block__head h3 { text-transform: uppercase; letter-spacing: .14em; font-size: clamp(1.1rem, 1.4vw, 1.4rem); font-weight: 500; }
+/* Zusatz-Label rechts neben der Rubrik in Schreibschrift (z. B. „Preis", „inkl. Waschen") */
+.price-block__note {
+  margin-left: auto;
+  font-family: var(--script);
+  font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--gold-deep);
+  font-weight: 400;
+  line-height: 1;
+}
 
 .price-row {
   display: grid; grid-template-columns: 1fr auto;
   gap: .35rem 1.5rem; align-items: baseline;
   padding: 1.15rem 0;
-  border-bottom: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line);
 }
-.price-row__name { font-family: var(--display); font-size: 1.2rem; color: var(--espresso); }
-.price-row__value { font-family: var(--display); font-size: 1.2rem; color: var(--gold-deep); white-space: nowrap; }
-.price-row__desc { grid-column: 1 / -1; font-size: .88rem; color: var(--muted); line-height: 1.6; max-width: 46rem; }
+.price-row__name { font-family: var(--display); font-size: 1.22rem; font-weight: 500; color: var(--espresso); }
+.price-row__value { font-family: var(--display); font-size: 1.22rem; font-weight: 500; color: var(--gold-ink); white-space: nowrap; }
+.price-row__desc { grid-column: 1 / -1; font-size: .95rem; font-weight: 400; color: var(--ink); line-height: 1.62; max-width: 46rem; }
+
+/* Preiszeilen nacheinander einblenden – jede Zeile hat ein eigenes .reveal */
+.price-block__head.reveal        { transition-delay: 0s; }
+.price-row.reveal:nth-child(2)   { transition-delay: .04s; }
+.price-row.reveal:nth-child(3)   { transition-delay: .08s; }
+.price-row.reveal:nth-child(4)   { transition-delay: .12s; }
+.price-row.reveal:nth-child(5)   { transition-delay: .16s; }
+.price-row.reveal:nth-child(6)   { transition-delay: .2s; }
+.price-row.reveal:nth-child(7)   { transition-delay: .24s; }
 
 .price-legal {
   margin-top: 2.5rem; padding: 1.5rem 1.75rem;
   background: var(--cream-deep); border-left: 2px solid var(--gold);
-  font-size: .85rem; color: var(--muted);
+  font-size: .9rem; color: var(--ink);
 }
 
 /* 8.6 Ablauf / Schritte */
@@ -703,6 +765,119 @@ p:last-child { margin-bottom: 0; }
 .step p { font-size: .92rem; color: var(--muted); }
 .section--dark .step { border-color: rgba(250, 246, 240, .18); }
 .section--dark .step p { color: rgba(250, 246, 240, .68); }
+
+/* 8.6b Ablauf als Zeitstrahl – Linie füllt sich beim Scrollen,
+   Texte liegen abwechselnd links und rechts vom Strich */
+.timeline {
+  --tl-gap: clamp(2rem, 4vw, 3.25rem);   /* Abstand Text ↔ Mittellinie */
+  --tl-node: 15px;                        /* Durchmesser der Punkte */
+  position: relative;
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+/* Die durchgehende, gedimmte Linie in der Mitte */
+.timeline__line {
+  position: absolute;
+  top: .25rem; bottom: .25rem; left: 50%;
+  width: 2px; margin-left: -1px;
+  background: rgba(250, 246, 240, .2);
+  overflow: hidden;
+}
+/* Der eingefärbte Teil – Skalierung wird per JS an die Scrollposition gesetzt
+   (transform statt height: kein Layout-Thrash, läuft auf der GPU) */
+.timeline__fill {
+  position: absolute; inset: 0 0 0 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  background: linear-gradient(to bottom, var(--gold-light), var(--gold-deep));
+  transition: transform .25s linear;
+}
+
+.timeline__list {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.timeline__item { position: relative; width: 50%; }
+.timeline__item:nth-child(odd)  { padding-right: var(--tl-gap); text-align: right; }
+.timeline__item:nth-child(even) { margin-left: 50%; padding-left: var(--tl-gap); text-align: left; }
+
+/* Punkt auf der Linie */
+.timeline__node {
+  position: absolute; top: .35rem;
+  width: var(--tl-node); height: var(--tl-node);
+  border-radius: 50%;
+  background: var(--espresso);
+  border: 2px solid rgba(250, 246, 240, .35);
+  z-index: 1;
+  transition: background-color var(--fast), border-color var(--fast),
+              box-shadow var(--fast), transform var(--fast);
+}
+.timeline__item:nth-child(odd)  .timeline__node { right: calc(var(--tl-node) / -2); }
+.timeline__item:nth-child(even) .timeline__node { left:  calc(var(--tl-node) / -2); }
+
+/* Punkt aktiv, sobald die Fortschrittslinie ihn erreicht hat */
+.timeline__item.is-active .timeline__node {
+  background: var(--gold);
+  border-color: var(--gold-light);
+  box-shadow: 0 0 0 6px rgba(192, 160, 106, .16);
+  transform: scale(1.06);
+}
+
+/* Text ist zunächst nur schwach sichtbar und wird klar, sobald die
+   Fortschrittslinie den zugehörigen Punkt erreicht hat */
+.timeline__card {
+  position: relative;
+  opacity: .3;
+  transition: opacity .55s var(--ease);
+}
+.timeline__item.is-active .timeline__card { opacity: 1; }
+.timeline__card::before {
+  content: ""; position: absolute; top: .8rem;
+  width: var(--tl-gap); height: 1px;
+  background: rgba(250, 246, 240, .2);
+  transition: background-color var(--fast);
+}
+.timeline__item:nth-child(odd)  .timeline__card::before { right: calc(var(--tl-gap) * -1); }
+.timeline__item:nth-child(even) .timeline__card::before { left:  calc(var(--tl-gap) * -1); }
+.timeline__item.is-active .timeline__card::before { background: var(--gold); }
+
+.timeline__num {
+  display: block;
+  font-family: var(--body); font-size: .7rem; letter-spacing: .2em;
+  color: var(--gold-deep); margin-bottom: .7rem;
+  transition: color var(--fast);
+}
+.timeline__item.is-active .timeline__num { color: var(--gold-light); }
+
+.timeline__card h4 {
+  text-transform: uppercase; letter-spacing: .1em;
+  font-size: 1.05rem; margin-bottom: .8rem;
+}
+.timeline__card p { font-size: .92rem; color: rgba(250, 246, 240, .68); }
+
+/* Mobil: Linie nach links, alle Texte einspaltig rechts daneben */
+@media (max-width: 700px) {
+  .timeline { --tl-gap: 2.75rem; --tl-rail: 8px; max-width: 32rem; }
+  .timeline__line { left: calc(var(--tl-rail) - 1px); }
+  .timeline__item,
+  .timeline__item:nth-child(odd),
+  .timeline__item:nth-child(even) {
+    width: 100%; margin-left: 0;
+    padding-left: var(--tl-gap); padding-right: 0;
+    text-align: left;
+  }
+  .timeline__item:nth-child(odd)  .timeline__node,
+  .timeline__item:nth-child(even) .timeline__node {
+    left: calc(var(--tl-rail) - var(--tl-node) / 2); right: auto;
+  }
+  .timeline__item:nth-child(odd)  .timeline__card::before,
+  .timeline__item:nth-child(even) .timeline__card::before {
+    left: calc((var(--tl-gap) - var(--tl-rail)) * -1); right: auto;
+    width: calc(var(--tl-gap) - var(--tl-rail));
+  }
+}
 
 /* 8.7 Stimmen */
 .quotes { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem);
@@ -761,21 +936,23 @@ p:last-child { margin-bottom: 0; }
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
 .info-tile { padding: clamp(1.5rem, 2.5vw, 2rem); background: var(--white); border: 1px solid var(--line-soft); }
 .info-tile__icon { color: var(--gold-deep); margin-bottom: 1.1rem; }
-.info-tile h4 { text-transform: uppercase; letter-spacing: .12em; font-size: .92rem; margin-bottom: .7rem; }
+.info-tile h4 { text-transform: uppercase; letter-spacing: .12em; font-size: .95rem; font-weight: 500; margin-bottom: .7rem; }
 .info-tile p, .info-tile address {
-  font-size: .92rem; color: var(--muted); font-style: normal; line-height: 1.7;
+  font-size: .95rem; font-weight: 400; color: var(--ink); font-style: normal; line-height: 1.7;
 }
+.info-tile a { color: var(--espresso); }
 .info-tile a:hover { color: var(--gold-deep); }
 
 /* 8.11 Öffnungszeiten */
 .hours { list-style: none; margin: 0; padding: 0; }
 .hours li {
   display: flex; justify-content: space-between; gap: 1.5rem;
-  padding: .62rem 0; border-bottom: 1px solid var(--line-soft);
-  font-size: .92rem;
+  padding: .62rem 0; border-bottom: 1px solid var(--line);
+  font-size: .95rem;
 }
 .hours li:last-child { border-bottom: 0; }
-.hours span:last-child { color: var(--muted); white-space: nowrap; }
+.hours span:last-child { color: var(--ink); white-space: nowrap; }
+.info-tile .hours li { font-weight: 400; }
 .hours li.is-today { color: var(--gold-deep); font-weight: 400; }
 .hours li.is-today span:last-child { color: var(--gold-deep); }
 
@@ -784,17 +961,19 @@ p:last-child { margin-bottom: 0; }
 .form__row { display: grid; gap: 1.35rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
 .field { display: grid; gap: .5rem; }
 .field > label {
-  font-size: .68rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+  font-size: .74rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ink); font-weight: 400;
 }
 .field input, .field select, .field textarea {
   width: 100%; padding: .95rem 1.1rem;
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: 0;
-  font-size: .95rem; font-weight: 300;
+  font-size: .98rem; font-weight: 400; color: var(--espresso);
   transition: border-color var(--fast), box-shadow var(--fast);
   appearance: none;
 }
+.field input::placeholder, .field textarea::placeholder { color: var(--muted); opacity: 1; }
 .field select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23A3854E' stroke-width='1.2'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 1.1rem center;
@@ -809,11 +988,11 @@ p:last-child { margin-bottom: 0; }
 .field.has-error .field__error { display: block; }
 .field.has-error input, .field.has-error textarea, .field.has-error select { border-color: #B4675A; }
 
-.checkbox { display: flex; align-items: flex-start; gap: .8rem; font-size: .85rem; color: var(--muted); line-height: 1.6; }
+.checkbox { display: flex; align-items: flex-start; gap: .8rem; font-size: .9rem; font-weight: 400; color: var(--ink); line-height: 1.6; }
 .checkbox input { flex: none; width: 17px; height: 17px; margin-top: .28rem; accent-color: var(--gold-deep); }
-.checkbox a { color: var(--gold-deep); text-decoration: underline; text-underline-offset: 3px; }
+.checkbox a { color: var(--gold-ink); text-decoration: underline; text-underline-offset: 3px; }
 
-.form__note { font-size: .8rem; color: var(--muted); }
+.form__note { font-size: .85rem; font-weight: 400; color: var(--ink); }
 .form__status {
   display: none; padding: 1.1rem 1.35rem;
   border-left: 2px solid var(--gold); background: var(--cream-deep);
@@ -837,6 +1016,14 @@ p:last-child { margin-bottom: 0; }
 .booking-panel .eyebrow { color: var(--gold-light); }
 .booking-panel__actions { display: grid; gap: .75rem; }
 .booking-panel__meta { font-size: .78rem; letter-spacing: .06em; color: rgba(250, 246, 240, .55); }
+
+/* Primär-Button „Termin vereinbaren" im Panel: im Ruhezustand goldbeige,
+   beim Hover NICHT braun, sondern weiß mit dunkler Schrift */
+.booking-panel__actions .btn:not(.btn--light)::after { background: var(--white); }
+.booking-panel__actions .btn:not(.btn--light):hover,
+.booking-panel__actions .btn:not(.btn--light):focus-visible {
+  color: var(--espresso); border-color: var(--white);
+}
 
 /* 8.14 Sticky Aktionsleiste (mobil) */
 .action-bar {

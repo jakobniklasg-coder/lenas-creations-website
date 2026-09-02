@@ -135,6 +135,139 @@
   }
 
   /* ----------------------------------------------------------------------
+     5b · Ablauf-Zeitstrahl: Linie füllt sich mit dem Scrollen,
+          Punkte werden aktiv, sobald die Linie sie erreicht
+  ---------------------------------------------------------------------- */
+  function timeline() {
+    var box = $("[data-timeline]");
+    if (!box) return;
+    var fill = $("[data-timeline-fill]", box);
+    var items = $$(".timeline__item", box);
+    if (!fill || !items.length) return;
+
+    // Ohne Bewegung: Linie komplett gefüllt, alle Punkte aktiv
+    if (reduced || !("requestAnimationFrame" in window)) {
+      fill.style.transition = "none";
+      fill.style.transform = "scaleY(1)";
+      items.forEach(function (item) { item.classList.add("is-active"); });
+      return;
+    }
+
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var rect = box.getBoundingClientRect();
+      var anchor = window.innerHeight * 0.55; // Bezugslinie etwas unter der Mitte
+      var pct = (anchor - rect.top) / rect.height;
+      pct = Math.max(0, Math.min(1, pct));
+      fill.style.transform = "scaleY(" + pct.toFixed(4) + ")";
+
+      items.forEach(function (item) {
+        var node = $(".timeline__node", item);
+        var n = node.getBoundingClientRect();
+        item.classList.toggle("is-active", (n.top + n.height / 2) <= anchor);
+      });
+    }
+
+    function onScroll() {
+      if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    update();
+  }
+
+  /* ----------------------------------------------------------------------
+     5c · Verzweigung: drei Linien zeichnen sich beim Scrollen und
+          verbinden sich mit den drei Punkten über den Karten
+  ---------------------------------------------------------------------- */
+  function branch() {
+    var box = $("[data-branch]");
+    if (!box) return;
+    var svg = $(".branch__svg", box);
+    var paths = $$(".branch__path", box);
+    var dots = $$(".branch__dot", box);
+    var grid = box.nextElementSibling;
+    if (!svg || paths.length < 3 || !grid) return;
+
+    var lens = [0, 0, 0];
+
+    // SVG-Koordinaten = Pixel; Linien-Enden exakt auf die Mitte der drei Karten
+    function layout() {
+      var cards = $$(".service-card", grid);
+      if (cards.length < 3) return;
+      var b = box.getBoundingClientRect();
+      if (!b.width) return;
+      var w = b.width, h = b.height;
+      svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+      var rects = [0, 1, 2].map(function (i) { return cards[i].getBoundingClientRect(); });
+
+      // Stehen die drei Karten nicht in einer Reihe (Tablet/Handy), nur eine
+      // gerade Linie mit einem Punkt zeigen
+      var oneRow = Math.abs(rects[2].top - rects[0].top) < 8;
+      box.classList.toggle("branch--stack", !oneRow);
+
+      if (!oneRow) {
+        var mx = w / 2;
+        paths[0].setAttribute("d", "M" + mx + " 1 L" + mx + " " + h);
+        lens[0] = paths[0].getTotalLength();
+        paths[0].style.strokeDasharray = lens[0];
+        dots[1].style.setProperty("--x", "50%");
+        return;
+      }
+
+      var cx = rects.map(function (r) { return (r.left + r.width / 2) - b.left; });
+      var sx = cx[1]; // Start: Mitte der mittleren Karte, knapp unter der Überschrift
+      paths[0].setAttribute("d", "M" + sx + " 1 L" + sx + " " + h);
+      paths[1].setAttribute("d", "M" + sx + " 1 C" + sx + " " + (h * 0.72) + " " + cx[0] + " " + (h * 0.64) + " " + cx[0] + " " + h);
+      paths[2].setAttribute("d", "M" + sx + " 1 C" + sx + " " + (h * 0.72) + " " + cx[2] + " " + (h * 0.64) + " " + cx[2] + " " + h);
+      paths.forEach(function (p, i) {
+        var L = p.getTotalLength();
+        lens[i] = L;
+        p.style.strokeDasharray = L;
+      });
+      dots.forEach(function (d, i) { d.style.setProperty("--x", (cx[i] / w * 100) + "%"); });
+    }
+
+    function draw(pct) {
+      paths.forEach(function (p, i) {
+        p.style.strokeDashoffset = (lens[i] * (1 - pct)).toFixed(1);
+      });
+      box.classList.toggle("is-linked", pct > 0.92);
+    }
+
+    // Ohne Bewegung: Linien fertig gezeichnet, Punkte verbunden
+    if (reduced || !("requestAnimationFrame" in window)) {
+      layout();
+      draw(1);
+      return;
+    }
+
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var rect = box.getBoundingClientRect();
+      var vh = window.innerHeight;
+      // 0 wenn die Oberkante bei 88 % der Höhe steht, 1 wenn sie 42 % erreicht hat
+      var pct = (vh * 0.88 - rect.top) / (vh * 0.46);
+      draw(Math.max(0, Math.min(1, pct)));
+    }
+
+    function onScroll() {
+      if (!ticking) { window.requestAnimationFrame(update); ticking = true; }
+    }
+
+    layout();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", function () { layout(); onScroll(); }, { passive: true });
+    window.addEventListener("load", function () { layout(); update(); });
+    update();
+  }
+
+  /* ----------------------------------------------------------------------
      6 · Vorher/Nachher-Schieberegler
   ---------------------------------------------------------------------- */
   function compare() {
@@ -354,6 +487,8 @@
     header();
     mobileNav();
     reveal();
+    timeline();
+    branch();
     compare();
     gallery();
     accordion();

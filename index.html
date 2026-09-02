@@ -126,10 +126,20 @@
 
   <section class="section" id="leistungen">
     <div class="wrap">
-      <div class="section-head section-head--center reveal">
+      <div class="section-head section-head--center section-head--branch reveal">
         <span class="eyebrow">Drei Schwerpunkte</span>
         <h2>Worauf ich mich spezialisiert habe</h2>
-        <hr class="rule rule--center">
+      </div>
+
+      <div class="branch" data-branch aria-hidden="true">
+        <svg class="branch__svg" viewBox="0 0 300 100">
+          <path class="branch__path" d="M150 1 L150 100"/>
+          <path class="branch__path" d="M150 1 C150 70 50 62 50 100"/>
+          <path class="branch__path" d="M150 1 C150 70 250 62 250 100"/>
+        </svg>
+        <span class="branch__dot"></span>
+        <span class="branch__dot"></span>
+        <span class="branch__dot"></span>
       </div>
 
       <div class="service-grid">
@@ -302,23 +312,44 @@
         <span class="eyebrow">So läuft dein Termin</span>
         <h2>Vier Schritte, kein Rätselraten</h2>
       </div>
-      <div class="steps">
-        <div class="step reveal" data-delay="1">
-          <h4>Beratung</h4>
-          <p>Wir schauen uns dein Haar an, sprechen über Wünsche, Alltag und Pflege – und legen ein realistisches Ziel fest.</p>
+      <div class="timeline" data-timeline>
+        <div class="timeline__line" aria-hidden="true">
+          <span class="timeline__fill" data-timeline-fill></span>
         </div>
-        <div class="step reveal" data-delay="2">
-          <h4>Plan &amp; Preis</h4>
-          <p>Du bekommst vor dem ersten Pinselstrich eine klare Ansage: Was passiert heute, was kostet es, was kommt später.</p>
-        </div>
-        <div class="step reveal" data-delay="3">
-          <h4>Umsetzung</h4>
-          <p>Gearbeitet wird in Ruhe und mit Rücksicht auf die Haarstruktur. Pflege und Bond-Schutz gehören dazu, nicht als Extra.</p>
-        </div>
-        <div class="step reveal" data-delay="4">
-          <h4>Styling &amp; Pflege</h4>
-          <p>Zum Schluss zeige ich dir, wie der Look zu Hause funktioniert – mit dem, was du schon im Bad stehen hast.</p>
-        </div>
+        <ol class="timeline__list">
+          <li class="timeline__item">
+            <span class="timeline__node" aria-hidden="true"></span>
+            <div class="timeline__card">
+              <span class="timeline__num">01</span>
+              <h4>Beratung</h4>
+              <p>Wir schauen uns dein Haar an, sprechen über Wünsche, Alltag und Pflege – und legen ein realistisches Ziel fest.</p>
+            </div>
+          </li>
+          <li class="timeline__item">
+            <span class="timeline__node" aria-hidden="true"></span>
+            <div class="timeline__card">
+              <span class="timeline__num">02</span>
+              <h4>Plan &amp; Preis</h4>
+              <p>Du bekommst vor dem ersten Pinselstrich eine klare Ansage: Was passiert heute, was kostet es, was kommt später.</p>
+            </div>
+          </li>
+          <li class="timeline__item">
+            <span class="timeline__node" aria-hidden="true"></span>
+            <div class="timeline__card">
+              <span class="timeline__num">03</span>
+              <h4>Umsetzung</h4>
+              <p>Gearbeitet wird in Ruhe und mit Rücksicht auf die Haarstruktur. Pflege und Bond-Schutz gehören dazu, nicht als Extra.</p>
+            </div>
+          </li>
+          <li class="timeline__item">
+            <span class="timeline__node" aria-hidden="true"></span>
+            <div class="timeline__card">
+              <span class="timeline__num">04</span>
+              <h4>Styling &amp; Pflege</h4>
+              <p>Zum Schluss zeige ich dir, wie der Look zu Hause funktioniert – mit dem, was du schon im Bad stehen hast.</p>
+            </div>
+          </li>
+        </ol>
       </div>
     </div>
   </section>
