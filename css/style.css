@@ -1160,6 +1160,16 @@ p:last-child { margin-bottom: 0; }
   }
   .reveal { opacity: 1; transform: none; }
   .hero__eyebrow, .hero__title, .hero__sub, .hero__claim, .hero__actions { opacity: 1; }
+
+  /* Scroll-Effekte von Zeitstrahl & Verzweigung sollen bewusst für ALLE
+     Besucher weich laufen – daher die Übergänge hier wieder aktivieren */
+  .timeline__fill { transition-duration: .25s !important; }
+  .timeline__card,
+  .timeline__node,
+  .timeline__num,
+  .timeline__card::before { transition-duration: .4s !important; }
+  .branch__path { transition-duration: .18s !important; }
+  .branch__dot { transition-duration: .35s !important; }
 }
 
 @media print {

@@ -145,8 +145,10 @@
     var items = $$(".timeline__item", box);
     if (!fill || !items.length) return;
 
-    // Ohne Bewegung: Linie komplett gefüllt, alle Punkte aktiv
-    if (reduced || !("requestAnimationFrame" in window)) {
+    // Der Scroll-Fortschritt soll für ALLE Besucher laufen (auch bei
+    // "Bewegung reduzieren"); nur ohne requestAnimationFrame gibt es den
+    // statischen Endzustand als Fallback.
+    if (!("requestAnimationFrame" in window)) {
       fill.style.transition = "none";
       fill.style.transform = "scaleY(1)";
       items.forEach(function (item) { item.classList.add("is-active"); });
@@ -238,8 +240,9 @@
       box.classList.toggle("is-linked", pct > 0.92);
     }
 
-    // Ohne Bewegung: Linien fertig gezeichnet, Punkte verbunden
-    if (reduced || !("requestAnimationFrame" in window)) {
+    // Läuft für ALLE Besucher (auch bei "Bewegung reduzieren");
+    // nur ohne requestAnimationFrame gibt es den fertig gezeichneten Fallback.
+    if (!("requestAnimationFrame" in window)) {
       layout();
       draw(1);
       return;
