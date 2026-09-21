@@ -23,6 +23,10 @@ auf allen Seiten gleichzeitig.
 | `instagram`, `facebook` | vollständige Profil-Adressen |
 | `hours` | Öffnungszeiten, Montag bis Sonntag |
 | `formEndpoint` | Empfänger für das Kontaktformular (siehe Punkt 3) |
+| `testimonials`, `googleReviewsUrl` | Kundenstimmen und optionaler Google-Link (siehe Punkt 6) |
+| `vouchers` | Gutscheine: Beträge, Leistungen, Texte (siehe Punkt 7) |
+| `instagramGrid` | die sechs Instagram-Bilder, der Bereich braucht zusätzlich `instagram` (siehe Punkt 8) |
+| `heroVideo` | optionales Video im Kopfbereich, standardmäßig aus (siehe Punkt 9) |
 
 Der heutige Wochentag wird in den Öffnungszeiten automatisch hervorgehoben.
 
@@ -102,6 +106,9 @@ etwas geändert werden.
 | `galerie-01.jpg` bis `galerie-12.jpg` | Galerie | 900 × 1150 px, hoch |
 | `og-image.jpg` | Vorschaubild bei WhatsApp und Facebook | 1200 × 630 px |
 | `kontakt-salon.jpg` | Kopfbild Kontaktseite | 1400 × 950 px, quer |
+| `instagram/insta-01.jpg` bis `insta-06.jpg` | Instagram-Raster auf der Startseite | 1080 × 1080 px, **quadratisch (1:1)**, unter 150 KB |
+| `video/hero.mp4` (Ordner `video` neu anlegen) | optionales Video im Kopfbereich | 1920 × 1080 px, **16:9 quer**, MP4 (H.264), 6–15 Sekunden, ohne Ton, **unter 4 MB** |
+| `hero.jpg` (als `poster`) | Standbild zum Video, siehe Punkt 9 | 1920 × 1200 px, unter 300 KB |
 
 **Wichtig bei Vorher-Nachher:** beide Fotos aus derselben Position, gleicher
 Abstand, gleiche Kopfhaltung. Sonst springt das Bild beim Ziehen des Reglers.
@@ -127,6 +134,7 @@ suchen (Strg + F), Text zwischen den spitzen Klammern ersetzen, speichern.
 | `leistungen.html` | Preisliste und häufige Fragen |
 | `extensions.html` | Extensions, Methoden, Ablauf, FAQ |
 | `galerie.html` | Galerie und Vorher-Nachher |
+| `gutscheine.html` | Überschriften der Gutschein-Seite (Beträge und Texte stehen in `config.js`) |
 | `ueber-mich.html` | Vorstellung und Salon |
 | `kontakt.html` | Formular, Öffnungszeiten, Anfahrt |
 | `impressum.html`, `datenschutz.html` | Rechtliches |
@@ -143,9 +151,134 @@ Eine Preiszeile sieht so aus – nur die Texte zwischen `>` und `<` ändern:
 
 ---
 
-## 6. Vor dem Livegang – Pflichtliste
+## 6. Kundenstimmen pflegen
+
+Die Bewertungen stehen in `js/config.js` unter `testimonials`. Jede Bewertung ist
+ein Block in geschweiften Klammern, getrennt durch ein Komma:
+
+```js
+testimonials: [
+  { name: "Sarah M.", leistung: "Balayage", sterne: 5,
+    text: "Genau das kühle Blond, das ich mir gewünscht hatte." },
+  { name: "Nadine W.", leistung: "", sterne: 4,
+    text: "Ruhige Atmosphäre, tolles Ergebnis." }
+],
+```
+
+| Feld | Bedeutung |
+|---|---|
+| `name` | Vorname und Initial der Kundin |
+| `text` | die Bewertung |
+| `leistung` | optional, z. B. „Balayage“ – sonst `""` |
+| `sterne` | Zahl von 1 bis 5 |
+
+- **Neue Bewertung:** einen Block kopieren, unten einfügen, Texte ändern.
+- **Bewertung löschen:** den ganzen Block samt Komma entfernen.
+- **Keine Bewertungen:** `testimonials: [],` – dann verschwindet der Bereich von
+  selbst, auf der Startseite und auf der Leistungen-Seite.
+- Auf der Startseite erscheinen 3 Karten nebeneinander, bei mehr Bewertungen
+  kann man blättern (Wischen, Pfeil-Knöpfe oder Pfeiltasten). Auf der Seite
+  „Leistungen“ werden höchstens die ersten 3 gezeigt.
+- **Google-Link (optional):** `googleReviewsUrl: "https://…"` – dann erscheint
+  „Alle Bewertungen auf Google“. Leer lassen = kein Link. Den Link findet man im
+  Google-Unternehmensprofil unter „Bewertungen teilen“.
+
+> **Wichtig:** Die drei mitgelieferten Bewertungen sind **Platzhalter** und im Code
+> so gekennzeichnet. Vor dem Livegang durch echte Bewertungen (mit Erlaubnis der
+> Kundinnen) ersetzen oder die Liste leeren. Erfundene Bewertungen auf einer
+> Geschäftswebsite sind wettbewerbsrechtlich problematisch.
+
+---
+
+## 7. Gutscheine pflegen
+
+Die Seite `gutscheine.html` und der Teaser auf der Startseite lesen alles aus
+`vouchers` in `js/config.js`:
+
+```js
+vouchers: {
+  intro:  "Text oben auf der Gutschein-Seite …",
+  teaser: "Kurzer Text im Kasten auf der Startseite …",
+  values: [25, 50, 100],                       // Beträge in Euro
+  customValue: { enabled: true, label: "Wunschbetrag", text: "…" },
+  services: [
+    { id: "balayage", name: "Balayage", price: "ab 180 €", desc: "…" }
+  ],
+  deliveryNote: "Abholung im Salon oder Versand per Post …"
+},
+```
+
+| Eintrag | Was passiert |
+|---|---|
+| `values` | eine Kachel pro Betrag. `[25, 75]` zeigt nur diese zwei. Leere Liste = keine Wertgutscheine |
+| `customValue` | Kachel „Wunschbetrag“. `enabled: false` blendet sie aus |
+| `services` | Leistungsgutscheine. `id` klein und ohne Leerzeichen (z. B. `"schnitt"`), `price` ist ein frei formulierbarer Text |
+| `deliveryNote` | Hinweis zu Abholung und Versand, erscheint als Kasten „Abholung & Versand“ |
+
+Ein Klick auf „Gutschein anfragen“ öffnet das Kontaktformular. Die gewählte
+Kachel wird dabei automatisch eingetragen: Leistung „Gutschein“ ist vorausgewählt
+und die Nachricht enthält bereits einen Textvorschlag. Der E-Mail-Betreff heißt dann
+z. B. „Gutscheinanfrage (50 €)“. Es muss nichts weiter eingestellt werden.
+
+> Angaben zu Gültigkeitsdauer, Barauszahlung oder Einlösebedingungen sind hier
+> bewusst nicht vorformuliert. Wenn du solche Bedingungen nennen möchtest, trag sie
+> in `deliveryNote` ein und lass sie vorher kurz prüfen.
+
+---
+
+## 8. Instagram-Bilder
+
+Auf der Startseite erscheinen sechs quadratische Bilder. Jedes führt zu Lenas
+Instagram-Profil, dazu gibt es den Knopf „Folge mir auf Instagram“. Es wird nichts
+von Instagram geladen – die Bilder liegen im Ordner `images/instagram/`.
+
+**Einschalten:** in `js/config.js` den Eintrag `instagram` auf die echte
+Profil-Adresse setzen:
+
+```js
+instagram: "https://www.instagram.com/lenascreations/",
+```
+
+Solange dort nur `https://www.instagram.com/` steht (oder nichts), bleibt der
+ganze Bereich unsichtbar.
+
+**Bilder tauschen:** neues Bild im Ordner `images/instagram/` unter demselben
+Namen speichern (`insta-01.jpg` bis `insta-06.jpg`) und die alte Datei
+überschreiben. Ein aussagekräftiger Text für Sehbehinderte steht bei `alt` im
+Block `instagramGrid`, z. B. `alt: "Sandblonde Balayage, Nahaufnahme"`.
+
+---
+
+## 9. Optional: Video im Kopfbereich
+
+Standardmäßig ist das Video **aus**, der Kopfbereich sieht aus wie bisher.
+
+**Einschalten:**
+
+1. Kurzes Video (siehe Tabelle unten) in einen neuen Ordner `video` legen, z. B. `video/hero.mp4`.
+2. In `js/config.js`:
+
+```js
+heroVideo: { enabled: true, src: "video/hero.mp4", poster: "images/hero.jpg" },
+```
+
+Das Video läuft stumm, in Endlosschleife, hinter dem Text. Unten rechts gibt es einen
+Pause-Knopf. Besucherinnen mit der Einstellung „Bewegung reduzieren“ oder mit
+aktiviertem Datensparen sehen stattdessen nur das Standbild (`poster`).
+Adressen mit `https://…` werden absichtlich ignoriert, das Video muss auf dieser
+Website liegen. **Ausschalten:** `enabled: false`.
+
+**Tipp:** Kurze Clips (6–15 Sekunden), ruhige Bewegungen, kein Ton nötig.
+Große Videos machen die Seite auf dem Handy langsam.
+
+---
+
+## 10. Vor dem Livegang – Pflichtliste
 
 - [ ] `js/config.js` vollständig mit echten Daten gefüllt
+- [ ] **Platzhalter-Bewertungen ersetzt oder gelöscht** (`testimonials`, siehe Punkt 6)
+- [ ] Gutschein-Beträge, Leistungen und Hinweis zu Abholung/Versand geprüft (`vouchers`)
+- [ ] Instagram-Profiladresse eingetragen und Platzhalterbilder in `images/instagram/` ersetzt
 - [ ] **Impressum vervollständigt**: vollständiger Name, Anschrift, Steuernummer
       oder USt-IdNr., zuständige Handwerkskammer. Ein unvollständiges Impressum
       ist abmahnfähig.
@@ -162,7 +295,7 @@ Eine Preiszeile sieht so aus – nur die Texte zwischen `>` und `<` ändern:
 
 ---
 
-## 7. Hochladen
+## 11. Hochladen
 
 **Klassischer Webspace:** Den kompletten Inhalt dieses Ordners per FTP
 (z. B. mit [FileZilla](https://filezilla-project.org)) in das Hauptverzeichnis
@@ -188,10 +321,14 @@ einen lokalen Salon ist das der wichtigste Sichtbarkeitshebel überhaupt.
 
 ---
 
-## 8. Was drin ist
+## 12. Was drin ist
 
-- 8 Seiten: Startseite, Leistungen, Extensions, Galerie, Über mich, Kontakt,
-  Impressum, Datenschutz
+- 9 Seiten: Startseite, Leistungen, Extensions, Galerie, Gutscheine, Über mich,
+  Kontakt, Impressum, Datenschutz
+- Kundenstimmen mit Sternen, wischbar und per Tastatur bedienbar (aus `config.js`)
+- Gutschein-Seite mit Anfrage, die das Kontaktformular vorausfüllt
+- Instagram-Raster ohne Einbindung von Instagram (nur lokale Bilder und ein Link)
+- Optionales, abschaltbares Header-Video mit Pause-Knopf
 - Buchungs-Buttons, die sich über eine einzige Zeile auf jede
   Reservierungsplattform umstellen lassen
 - Vorher-Nachher-Regler zum Ziehen (Maus, Finger und Tastatur)
@@ -202,24 +339,25 @@ einen lokalen Salon ist das der wichtigste Sichtbarkeitshebel überhaupt.
 - Vollständig für Handy, Tablet und Desktop ausgelegt
 - Suchmaschinen-Grundlagen: Titel, Beschreibungen, Sitemap, `robots.txt`,
   strukturierte Daten vom Typ *HairSalon* für den Google-Eintrag
-- Schriften lokal eingebunden, keine Google-Server, keine Cookies, kein Tracking
+- Schrift: Arial (auf jedem Gerät vorhanden, es wird nichts geladen), keine Google-Server, keine Cookies, kein Tracking
   – dadurch ist kein Cookie-Banner nötig
 - Barrierefreiheit: Tastaturbedienung, sichtbarer Fokus, Rücksicht auf die
   Systemeinstellung „Bewegung reduzieren“
 
-## 9. Technische Struktur
+## 13. Technische Struktur
 
 ```
 lenas-creations/
-├── index.html … datenschutz.html   die acht Seiten
+├── index.html … datenschutz.html   die neun Seiten (inkl. gutscheine.html)
 ├── css/
 │   ├── style.css                   das gesamte Design
-│   └── fonts.css                   Einbindung der lokalen Schriften
+│   └── fonts.css                   derzeit ungenutzt (frühere lokale Schriften)
 ├── js/
 │   ├── config.js                   ► hier werden Daten gepflegt
-│   └── main.js                     Menü, Regler, Galerie, Formular
-├── fonts/                          Schriftdateien (SIL Open Font License)
-├── images/                         alle Bilder
+│   └── main.js                     Menü, Regler, Galerie, Formular, Stimmen, Gutscheine
+├── fonts/                          derzeit ungenutzt (frühere Schriftdateien)
+├── images/                         alle Bilder (images/instagram/ für das Raster)
+├── video/                          nur bei Bedarf: optionales Header-Video
 ├── favicon.svg                     Symbol im Browser-Tab
 ├── sitemap.xml, robots.txt         für Suchmaschinen
 └── .htaccess                       Serverkonfiguration (Apache)

@@ -437,6 +437,10 @@
 
       var data = new FormData(form);
       var endpoint = (CFG.formEndpoint || "").trim();
+      var subject = data.get("leistung") === "Gutschein"
+        ? (form.getAttribute("data-subject") || "Gutscheinanfrage")
+        : "Terminanfrage über die Website";
+      data.set("_subject", subject);
 
       if (endpoint) {
         var btn = $('button[type="submit"]', form);
@@ -463,7 +467,7 @@
           data.get("nachricht") || ""
         ].join("\n");
         window.location.href = "mailto:" + (CFG.email || "") +
-          "?subject=" + encodeURIComponent("Terminanfrage über die Website") +
+          "?subject=" + encodeURIComponent(subject) +
           "&body=" + encodeURIComponent(lines);
         say("Das E-Mail-Programm wurde geöffnet. Bitte dort noch auf Senden klicken.", true);
       }
@@ -482,11 +486,315 @@
   }
 
   /* ----------------------------------------------------------------------
-     11 · Start
+     Hilfsfunktionen für die aus config.js gerenderten Bereiche.
+     Inhalte werden immer per textContent gesetzt, nie als HTML.
+  ---------------------------------------------------------------------- */
+  function make(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  // Nur Pfade auf dieser Website erlauben (keine http(s)://, keine //host)
+  function isLocalPath(p) {
+    return typeof p === "string" && p.trim() !== "" && !/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(p.trim());
+  }
+  var ICON_STAR  = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><path d="M12 2.8l2.75 5.83 6.4.83-4.7 4.4 1.2 6.34L12 17.1l-5.65 3.1 1.2-6.34-4.7-4.4 6.4-.83z"/></svg>';
+  var ICON_ARROW = '<svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M0 4.5h12.5M9 1l3.5 3.5L9 8"/></svg>';
+  var ICON_INSTA = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>';
+  var ICON_PAUSE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
+  var ICON_PLAY  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+
+  /* ----------------------------------------------------------------------
+     11 · Kundenstimmen (aus config.js) + zugänglicher Slider
+  ---------------------------------------------------------------------- */
+  function slider(track, nav) {
+    var prev = $('[data-slide="prev"]', nav), next = $('[data-slide="next"]', nav);
+    if (!prev || !next) return;
+
+    function step() {
+      var c = track.firstElementChild;
+      if (!c) return 0;
+      var gap = parseFloat(window.getComputedStyle(track).columnGap) || 0;
+      return c.getBoundingClientRect().width + gap;
+    }
+    function update() {
+      var max = track.scrollWidth - track.clientWidth;
+      nav.hidden = max <= 4;
+      prev.setAttribute("aria-disabled", String(track.scrollLeft <= 4));
+      next.setAttribute("aria-disabled", String(track.scrollLeft >= max - 4));
+    }
+    function go(dir) {
+      track.scrollBy({ left: dir * step(), behavior: reduced ? "auto" : "smooth" });
+    }
+    prev.addEventListener("click", function () { go(-1); });
+    next.addEventListener("click", function () { go(1); });
+    track.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft")  { e.preventDefault(); go(-1); }
+      if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+    });
+    track.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update, { passive: true });
+    update();
+  }
+
+  function testimonials() {
+    $$("[data-testimonials]").forEach(function (sec) {
+      var list = (CFG.testimonials || []).filter(function (t) { return t && t.text; });
+      var limit = parseInt(sec.getAttribute("data-limit"), 10);
+      if (limit > 0) list = list.slice(0, limit);
+      var track = $("[data-testimonials-track]", sec);
+      if (!list.length || !track) { sec.hidden = true; return; }
+
+      list.forEach(function (t) {
+        var n = Math.max(1, Math.min(5, Math.round(Number(t.sterne)) || 5));
+        var fig = make("figure", "quote");
+        var stars = make("div", "quote__stars");
+        stars.setAttribute("role", "img");
+        stars.setAttribute("aria-label", n + " von 5 Sternen");
+        for (var i = 1; i <= 5; i++) {
+          stars.insertAdjacentHTML("beforeend", ICON_STAR.replace("<svg", '<svg class="' + (i <= n ? "is-on" : "") + '"'));
+        }
+        var bq = make("blockquote");
+        bq.appendChild(make("p", null, t.text));
+        fig.appendChild(stars);
+        fig.appendChild(bq);
+        fig.appendChild(make("figcaption", "quote__by", (t.name || "") + (t.leistung ? " · " + t.leistung : "")));
+        track.appendChild(fig);
+      });
+      sec.hidden = false;
+
+      var g = $("[data-google-reviews]", sec);
+      var gUrl = (CFG.googleReviewsUrl || "").trim();
+      if (g) {
+        if (/^https:\/\//i.test(gUrl)) { g.href = gUrl; g.hidden = false; } else { g.hidden = true; }
+      }
+
+      var nav = $(".tslider__nav", sec);
+      if (nav) slider(track, nav);
+    });
+  }
+
+  /* ----------------------------------------------------------------------
+     12 · Gutscheine (Seite gutscheine.html + Teaser auf der Startseite)
+  ---------------------------------------------------------------------- */
+  function voucherLink(query) {
+    return "kontakt.html?anliegen=gutschein" + query + "#anfrage";
+  }
+
+  function vouchers() {
+    var V = CFG.vouchers || {};
+
+    $$("[data-voucher-teaser]").forEach(function (el) { if (V.teaser) el.textContent = V.teaser; });
+    $$("[data-voucher-intro]").forEach(function (el)  { if (V.intro)  el.textContent = V.intro; });
+    $$("[data-voucher-note-box]").forEach(function (box) {
+      var note = (V.deliveryNote || "").trim();
+      var t = $("[data-voucher-note]", box);
+      if (t && note) { t.textContent = note; box.hidden = false; } else { box.hidden = true; }
+    });
+
+    // Wertgutscheine
+    var values = (V.values || []).filter(function (n) { return isFinite(n) && Number(n) > 0; });
+    var cv = V.customValue && V.customValue.enabled ? V.customValue : null;
+    var secV = $('[data-voucher-section="values"]');
+    var grid = $("[data-voucher-values]");
+    if (secV && grid) {
+      if (!values.length && !cv) {
+        secV.hidden = true;
+      } else {
+        function card(amount, text, href, word) {
+          var li = make("li", "voucher reveal");
+          li.appendChild(make("span", "voucher__amount" + (word ? " voucher__amount--word" : ""), amount));
+          li.appendChild(make("p", "voucher__text", text));
+          var a = make("a", "btn btn--outline btn--sm", "Gutschein anfragen");
+          a.href = href;
+          a.setAttribute("aria-label", "Gutschein anfragen: " + amount);
+          li.appendChild(a);
+          grid.appendChild(li);
+        }
+        values.forEach(function (n) { card(n + " €", "Wertgutschein", voucherLink("&wert=" + encodeURIComponent(n))); });
+        if (cv) card(cv.label || "Wunschbetrag", cv.text || "", voucherLink("&wert=wunsch"), true);
+        secV.hidden = false;
+      }
+    }
+
+    // Leistungsgutscheine
+    var services = (V.services || []).filter(function (s) { return s && s.id && s.name; });
+    var secS = $('[data-voucher-section="services"]');
+    var list = $("[data-voucher-services]");
+    if (secS && list) {
+      if (!services.length) {
+        secS.hidden = true;
+      } else {
+        services.forEach(function (s) {
+          var row = make("div", "price-row reveal");
+          row.appendChild(make("span", "price-row__name", s.name));
+          row.appendChild(make("span", "price-row__value", s.price || ""));
+          if (s.desc) row.appendChild(make("span", "price-row__desc", s.desc));
+          var a = make("a", "link-arrow price-row__cta", "Gutschein anfragen ");
+          a.href = voucherLink("&leistung=" + encodeURIComponent(s.id));
+          a.setAttribute("aria-label", "Gutschein anfragen: " + s.name);
+          a.insertAdjacentHTML("beforeend", ICON_ARROW);
+          row.appendChild(a);
+          list.appendChild(row);
+        });
+        secS.hidden = false;
+      }
+    }
+  }
+
+  // Kontaktformular: Parameter aus gutscheine.html auslesen und Felder vorbelegen
+  function prefillForm() {
+    var form = $("[data-form]");
+    if (!form || !window.URLSearchParams) return;
+    var q = new URLSearchParams(window.location.search);
+    if (q.get("anliegen") !== "gutschein") return;
+
+    var V = CFG.vouchers || {};
+    var what = "", subject = "Gutscheinanfrage";
+    var wert = q.get("wert"), leistung = q.get("leistung");
+    var values = (V.values || []).map(String);
+
+    if (wert === "wunsch" && V.customValue && V.customValue.enabled) {
+      what = "einen Gutschein über einen Wunschbetrag"; subject += " (Wunschbetrag)";
+    } else if (wert && values.indexOf(wert) > -1) {
+      what = "einen Gutschein im Wert von " + wert + " €"; subject += " (" + wert + " €)";
+    } else if (leistung) {
+      (V.services || []).forEach(function (s) {
+        if (s && s.id === leistung) { what = "einen Gutschein für " + s.name; subject += " (" + s.name + ")"; }
+      });
+    }
+    if (!what) what = "einen Gutschein";
+    form.setAttribute("data-subject", subject);
+
+    var select = $("#leistung", form);
+    if (select) {
+      $$("option", select).forEach(function (o) { if (o.value === "Gutschein") select.value = "Gutschein"; });
+    }
+    var msg = $("#nachricht", form);
+    if (msg && !msg.value) {
+      msg.value = "Hallo Lena,\n\nich möchte gern " + what + " anfragen. " +
+                  "Bitte teile mir mit, ob ich ihn im Salon abholen kann oder per Post bekomme.\n\n";
+    }
+  }
+
+  /* ----------------------------------------------------------------------
+     13 · Instagram-Raster (ohne Embed, nur lokale Bilder + Link)
+  ---------------------------------------------------------------------- */
+  function isInstagramProfile(url) {
+    try {
+      var u = new URL(url);
+      return /^https?:$/.test(u.protocol) &&
+             /(^|\.)instagram\.com$/i.test(u.hostname) &&
+             u.pathname.replace(/\//g, "") !== "";
+    } catch (e) { return false; }
+  }
+
+  function instagramGrid() {
+    $$("[data-insta]").forEach(function (sec) {
+      var url = (CFG.instagram || "").trim();
+      var imgs = ((CFG.instagramGrid || {}).images || []).filter(function (i) {
+        return i && isLocalPath(i.src);
+      }).slice(0, 6);
+      var grid = $("[data-insta-grid]", sec);
+      if (!grid || !imgs.length || !isInstagramProfile(url)) { sec.hidden = true; return; }
+
+      imgs.forEach(function (i) {
+        var li = make("li");
+        var a = make("a", "insta-tile");
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.setAttribute("aria-label", (i.alt || "Instagram-Beitrag") + " – Instagram-Profil öffnen (neues Fenster)");
+        var img = make("img");
+        img.src = i.src;
+        img.alt = "";
+        img.width = 800; img.height = 800;
+        img.loading = "lazy";
+        a.appendChild(img);
+        var ic = make("span", "insta-tile__icon");
+        ic.setAttribute("aria-hidden", "true");
+        ic.innerHTML = ICON_INSTA;
+        a.appendChild(ic);
+        li.appendChild(a);
+        grid.appendChild(li);
+      });
+
+      var btn = $("[data-insta-link]", sec);
+      if (btn) { btn.href = url; btn.target = "_blank"; btn.rel = "noopener"; }
+      sec.hidden = false;
+    });
+  }
+
+  /* ----------------------------------------------------------------------
+     14 · Optionales Header-Video (standardmäßig aus, siehe config.js)
+  ---------------------------------------------------------------------- */
+  function heroVideo() {
+    var cfg = CFG.heroVideo || {};
+    var media = $(".hero__media");
+    if (!cfg.enabled || !media) return;
+
+    var src = (cfg.src || "").trim();
+    var poster = isLocalPath(cfg.poster) ? cfg.poster.trim() : "";
+
+    function usePoster() {
+      var img = $("img", media);
+      if (!poster || !img) return;
+      $$("source", media).forEach(function (s) { s.parentNode.removeChild(s); });
+      img.removeAttribute("srcset");
+      img.src = poster;
+    }
+
+    var saveData = window.navigator.connection && window.navigator.connection.saveData;
+    if (!isLocalPath(src) || reduced || saveData) { usePoster(); return; }
+
+    var v = document.createElement("video");
+    v.className = "hero__video";
+    v.muted = true; v.defaultMuted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+    v.setAttribute("muted", ""); v.setAttribute("playsinline", "");
+    v.setAttribute("aria-hidden", "true");
+    v.tabIndex = -1;
+    v.preload = "metadata";
+    if (poster) v.poster = poster;
+    v.src = src;
+    media.appendChild(v);
+
+    var btn = make("button", "hero__pause");
+    btn.type = "button";
+    btn.hidden = true;
+    (media.parentNode || media).appendChild(btn);
+
+    function sync() {
+      var p = v.paused;
+      btn.setAttribute("aria-label", p ? "Hintergrundvideo abspielen" : "Hintergrundvideo pausieren");
+      btn.innerHTML = p ? ICON_PLAY : ICON_PAUSE;
+    }
+    v.addEventListener("playing", function () { media.classList.add("has-video"); btn.hidden = false; sync(); });
+    v.addEventListener("pause", sync);
+    v.addEventListener("play", sync);
+    v.addEventListener("error", function () {
+      if (v.parentNode) v.parentNode.removeChild(v);
+      if (btn.parentNode) btn.parentNode.removeChild(btn);
+      media.classList.remove("has-video");
+      usePoster();
+    });
+    btn.addEventListener("click", function () { if (v.paused) v.play(); else v.pause(); });
+    sync();
+
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { /* Autoplay blockiert: Bild bleibt sichtbar */ });
+  }
+
+  /* ----------------------------------------------------------------------
+     15 · Start
   ---------------------------------------------------------------------- */
   function init() {
     applyConfig();
     renderHours();
+    testimonials();
+    vouchers();
+    instagramGrid();
+    heroVideo();
     header();
     mobileNav();
     reveal();
@@ -497,6 +805,7 @@
     accordion();
     actionBar();
     contactForm();
+    prefillForm();
   }
 
   if (document.readyState === "loading") {

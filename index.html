@@ -21,9 +21,6 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="favicon.svg">
 
-<link rel="preload" href="fonts/cormorant-garamond-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/jost-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/style.css">
 
 <script type="application/ld+json">
@@ -70,7 +67,7 @@
       <span class="brand__mark">Lenas<br>Creations<span class="brand__sub">Exklusiv Haarsalon</span></span>
     </a>
     <nav class="nav" aria-label="Hauptmenü">
-      <ul class="nav__list"><li><a class="nav__link" href="index.html" aria-current="page">Home</a></li><li><a class="nav__link" href="leistungen.html">Leistungen</a></li><li><a class="nav__link" href="extensions.html">Extensions</a></li><li><a class="nav__link" href="galerie.html">Galerie</a></li><li><a class="nav__link" href="ueber-mich.html">Über mich</a></li><li><a class="nav__link" href="kontakt.html">Kontakt</a></li></ul>
+      <ul class="nav__list"><li><a class="nav__link" href="index.html" aria-current="page">Home</a></li><li><a class="nav__link" href="leistungen.html">Leistungen</a></li><li><a class="nav__link" href="extensions.html">Extensions</a></li><li><a class="nav__link" href="galerie.html">Galerie</a></li><li><a class="nav__link" href="gutscheine.html">Gutscheine</a></li><li><a class="nav__link" href="ueber-mich.html">Über mich</a></li><li><a class="nav__link" href="kontakt.html">Kontakt</a></li></ul>
     </nav>
     <div class="header__cta"><a class="btn btn--sm" data-booking href="kontakt.html#termin"><span>Termin vereinbaren</span><svg class="btn__ext" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1.5h6v6"/><path d="M10.5 1.5 5 7"/><path d="M9 8v2.5h-7.5V3H4"/></svg></a></div>
     <button class="burger" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="mobile-nav">
@@ -81,7 +78,7 @@
 
 <div class="mobile-nav" id="mobile-nav">
   <nav aria-label="Menü">
-    <ul class="mobile-nav__list"><li><a href="index.html">Home</a></li><li><a href="leistungen.html">Leistungen</a></li><li><a href="extensions.html">Extensions</a></li><li><a href="galerie.html">Galerie</a></li><li><a href="ueber-mich.html">Über mich</a></li><li><a href="kontakt.html">Kontakt</a></li></ul>
+    <ul class="mobile-nav__list"><li><a href="index.html">Home</a></li><li><a href="leistungen.html">Leistungen</a></li><li><a href="extensions.html">Extensions</a></li><li><a href="galerie.html">Galerie</a></li><li><a href="gutscheine.html">Gutscheine</a></li><li><a href="ueber-mich.html">Über mich</a></li><li><a href="kontakt.html">Kontakt</a></li></ul>
   </nav>
   <div class="mobile-nav__foot">
     <a class="btn btn--block" data-booking href="kontakt.html#termin"><span>Termin vereinbaren</span><svg class="btn__ext" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1.5h6v6"/><path d="M10.5 1.5 5 7"/><path d="M9 8v2.5h-7.5V3H4"/></svg></a>
@@ -354,30 +351,46 @@
     </div>
   </section>
 
-  <section class="section section--sand">
+  <section class="section section--sand" data-testimonials hidden>
     <div class="wrap">
       <div class="section-head section-head--center reveal">
         <span class="eyebrow">Stimmen</span>
-        <h2>Was Kundinnen sagen</h2>
+        <h2>Das sagen meine Kundinnen</h2>
         <hr class="rule rule--center">
       </div>
-      <div class="quotes">
-        <figure class="quote reveal" data-delay="1">
-          <div class="quote__stars" aria-label="5 von 5 Sternen">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
-          <blockquote><p>Endlich Blond, das nicht orange wird. Lena hat mir vorher genau erklärt, warum wir zwei Termine brauchen – und sie hatte recht.</p></blockquote>
-          <figcaption class="quote__by">Marie K. &middot; Balayage</figcaption>
-        </figure>
-        <figure class="quote reveal" data-delay="2">
-          <div class="quote__stars" aria-label="5 von 5 Sternen">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
-          <blockquote><p>Die Extensions sieht man wirklich nicht, nicht mal im Zopf. Nach acht Wochen sitzen sie noch genauso gut wie am ersten Tag.</p></blockquote>
-          <figcaption class="quote__by">Jasmin R. &middot; Tape Extensions</figcaption>
-        </figure>
-        <figure class="quote reveal" data-delay="3">
-          <div class="quote__stars" aria-label="5 von 5 Sternen">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
-          <blockquote><p>Ruhiger Salon, kein Gedränge, keine Hektik. Man merkt, dass man nicht zwischen drei anderen Terminen abgefertigt wird.</p></blockquote>
-          <figcaption class="quote__by">Sandra B. &middot; Farbe &amp; Schnitt</figcaption>
-        </figure>
+      <div class="tslider reveal">
+        <div class="tslider__track" data-testimonials-track tabindex="0" role="region" aria-label="Kundenstimmen – mit den Pfeiltasten blättern"></div>
+        <div class="tslider__nav" hidden>
+          <button class="tslider__btn" type="button" data-slide="prev" aria-label="Vorherige Bewertung"><svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M14 4.5H1.5M5 1 1.5 4.5 5 8"/></svg></button>
+          <button class="tslider__btn" type="button" data-slide="next" aria-label="Nächste Bewertung"><svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M0 4.5h12.5M9 1l3.5 3.5L9 8"/></svg></button>
+        </div>
       </div>
+      <p class="tslider__more"><a class="link-arrow" data-google-reviews href="#" target="_blank" rel="noopener" hidden>Alle Bewertungen auf Google <svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M0 4.5h12.5M9 1l3.5 3.5L9 8"/></svg></a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="gift reveal">
+        <span class="gift__icon" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8"/><path d="M12 8c-1-3-4-4.5-5.5-3.5S6.5 8 12 8zM12 8c1-3 4-4.5 5.5-3.5S17.5 8 12 8z"/></svg></span>
+        <span class="eyebrow">Gutscheine</span>
+        <h2>Verschenke ein Wohlfühlerlebnis</h2>
+        <p class="script">Zeit für sich selbst – schön verpackt.</p>
+        <p data-voucher-teaser>Ein Gutschein für eine Behandlung oder einen Wunschbetrag – persönlich abgestimmt und liebevoll überreicht.</p>
+        <a class="btn" href="gutscheine.html">Gutscheine ansehen</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sand" data-insta hidden>
+    <div class="wrap">
+      <div class="section-head section-head--center reveal">
+        <span class="eyebrow">Instagram</span>
+        <h2>Einblicke aus dem Salon</h2>
+        <hr class="rule rule--center">
+      </div>
+      <ul class="insta-grid reveal" data-insta-grid></ul>
+      <p class="insta-more"><a class="btn btn--outline" data-insta-link href="#" target="_blank" rel="noopener"><span>Folge mir auf Instagram</span><svg class="btn__ext" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1.5h6v6"/><path d="M10.5 1.5 5 7"/><path d="M9 8v2.5h-7.5V3H4"/></svg></a></p>
     </div>
   </section>
 
@@ -440,6 +453,7 @@
         <p class="script">Ich freue mich auf dich.</p>
         <a class="btn btn--light" data-booking href="kontakt.html#termin"><span>Termin vereinbaren</span><svg class="btn__ext" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 1.5h6v6"/><path d="M10.5 1.5 5 7"/><path d="M9 8v2.5h-7.5V3H4"/></svg></a>
         <span class="footer__contact" style="font-size:.78rem" data-booking-note></span>
+        <a class="link-arrow" href="gutscheine.html">Gutschein verschenken <svg width="14" height="9" viewBox="0 0 14 9" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="M0 4.5h12.5M9 1l3.5 3.5L9 8"/></svg></a>
       </div>
 
     </div>
