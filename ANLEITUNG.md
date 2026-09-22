@@ -100,12 +100,19 @@ etwas geändert werden.
 | `leistung-blond.jpg` u. a. | Leistungskarten | 900 × 1100 px, hoch |
 | `lena-portrait.jpg` | Über mich | 1000 × 1250 px, hoch |
 | `lena-arbeit.jpg` | Startseite, Abschnitt „Willkommen“ | 1200 × 1400 px, hoch |
-| `salon-1/2/3.jpg` | Salonbilder auf „Über mich“ | 1200 × 900 px, quer |
+| `salon-1.jpg`, `salon-waschplatz.jpg`, `salon-details.jpg` | Salonbilder auf „Über mich“ | 1200 × 900 px, quer |
+| `salon-2.jpg` | Kopfbild Datenschutz | 1200 × 900 px, quer |
+| `salon-3.jpg` | Kopfbild Impressum | 1200 × 900 px, quer |
 | `extensions-*.jpg` | Extensions-Seite | 900 × 1100 px, hoch |
 | `ba-1-vorher.jpg` / `ba-1-nachher.jpg` | Vorher-Nachher-Regler (4 Paare) | 900 × 1100 px, **gleicher Bildausschnitt** |
 | `galerie-01.jpg` bis `galerie-12.jpg` | Galerie | 900 × 1150 px, hoch |
 | `og-image.jpg` | Vorschaubild bei WhatsApp und Facebook | 1200 × 630 px |
-| `kontakt-salon.jpg` | Kopfbild Kontaktseite | 1400 × 950 px, quer |
+| `kontakt-salon.jpg` | Kopfbild Kontaktseite | 1600 × 1000 px, quer |
+| `leistungen-hero-salon.jpg` | Kopfbild Leistungen | 1600 × 1000 px, quer |
+| `extensions-hero-salon.jpg` | Kopfbild Extensions | 1600 × 1000 px, quer |
+| `galerie-hero-salon.jpg` | Kopfbild Galerie | 1600 × 1000 px, quer |
+| `leistung-pflege.jpg` | Kopfbild Gutscheine | 1600 × 1000 px, quer |
+| `ueber-mich-hero-salon.jpg` | Kopfbild Über mich | 1600 × 1000 px, quer |
 | `instagram/insta-01.jpg` bis `insta-06.jpg` | Instagram-Raster auf der Startseite | 1080 × 1080 px, **quadratisch (1:1)**, unter 150 KB |
 | `video/hero.mp4` (Ordner `video` neu anlegen) | optionales Video im Kopfbereich | 1920 × 1080 px, **16:9 quer**, MP4 (H.264), 6–15 Sekunden, ohne Ton, **unter 4 MB** |
 | `hero.jpg` (als `poster`) | Standbild zum Video, siehe Punkt 9 | 1920 × 1200 px, unter 300 KB |
