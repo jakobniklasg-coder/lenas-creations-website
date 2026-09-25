@@ -24,7 +24,7 @@ window.SALON = {
   ---------------------------------------------------------------------- */
   bookingUrl:   "",
   bookingLabel: "Termin vereinbaren",
-  bookingFallback: "kontakt.html#termin",
+  bookingFallback: "kontakt.html#anfrage",
 
   /* ----------------------------------------------------------------------
      2) KONTAKTDATEN
@@ -38,6 +38,9 @@ window.SALON = {
   zip:          "21614",
   city:         "Buxtehude",
 
+  /* Vollständige Profil-Adressen eintragen, z. B. https://www.instagram.com/lenascreations/
+     Solange hier nur die Startseite des Netzwerks steht, bleiben die Symbole und
+     Links dazu auf der Website ausgeblendet. */
   instagram:    "https://www.instagram.com/",
   facebook:     "https://www.facebook.com/",
 

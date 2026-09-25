@@ -1,7 +1,10 @@
 # Lenas Creations – Serverkonfiguration (Apache)
 
-# Fehlerseite
-ErrorDocument 404 /index.html
+# Fehlerseite (echte 404, damit Suchmaschinen und Besucher kaputte Links erkennen)
+ErrorDocument 404 /404.html
+
+# Keine Verzeichnis-Auflistung
+Options -Indexes
 
 # Video-Dateien (für das optionale Header-Video)
 <IfModule mod_mime.c>
@@ -29,12 +32,24 @@ ErrorDocument 404 /index.html
 
 # Sicherheits-Header
 <IfModule mod_headers.c>
-  Header set X-Content-Type-Options "nosniff"
-  Header set Referrer-Policy "strict-origin-when-cross-origin"
-  Header set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "DENY"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+  # HSTS wirkt erst unter HTTPS; "preload" bewusst weggelassen (kaum rueckgaengig zu machen)
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+  # CSP passend zur Seite: keine fremden Skripte/Schriften/Bilder. style-src braucht
+  # 'unsafe-inline', weil einzelne Elemente style="..." nutzen.
+  # Wird spaeter ein Formulardienst (z. B. Formspree) eingetragen, dessen Adresse bei
+  # connect-src UND form-action ergaenzen, sonst blockiert der Browser das Senden.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' mailto:; object-src 'none'"
 </IfModule>
 
-# HTTPS erzwingen (erst aktivieren, wenn ein SSL-Zertifikat eingerichtet ist)
+# ---------------------------------------------------------------------------
+# HTTPS erzwingen
+# BEIM LIVEGANG: sobald das SSL-Zertifikat aktiv ist, bei den fuenf Zeilen unten
+# das "# " am Zeilenanfang entfernen. Vorher NICHT einschalten (Endlosschleife).
+# ---------------------------------------------------------------------------
 # <IfModule mod_rewrite.c>
 #   RewriteEngine On
 #   RewriteCond %{HTTPS} off
