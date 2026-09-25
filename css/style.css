@@ -724,7 +724,7 @@ p:last-child { margin-bottom: 0; }
   padding-bottom: 1.1rem; margin-bottom: .5rem;
   border-bottom: 1px solid var(--line);
 }
-.price-block__head h3 { text-transform: uppercase; letter-spacing: .14em; font-size: clamp(1.1rem, 1.4vw, 1.4rem); font-weight: 500; }
+.price-block__head :is(h2, h3) { text-transform: uppercase; letter-spacing: .14em; font-size: clamp(1.1rem, 1.4vw, 1.4rem); font-weight: 500; }
 /* Zusatz-Label rechts neben der Rubrik in Schreibschrift (z. B. „Preis", „inkl. Waschen") */
 .price-block__note {
   margin-left: auto;
@@ -771,7 +771,7 @@ p:last-child { margin-bottom: 0; }
   position: absolute; top: 1.1rem; left: 0;
   font-family: var(--body); font-size: .7rem; letter-spacing: .24em; color: var(--gold-deep);
 }
-.step h4 { text-transform: uppercase; letter-spacing: .1em; font-size: 1.05rem; margin-bottom: .8rem; }
+.step h3 { text-transform: uppercase; letter-spacing: .1em; font-size: 1.05rem; margin-bottom: .8rem; }
 .step p { font-size: .92rem; color: var(--muted); }
 .section--dark .step { border-color: rgba(250, 246, 240, .18); }
 .section--dark .step p { color: rgba(250, 246, 240, .68); }
@@ -861,7 +861,7 @@ p:last-child { margin-bottom: 0; }
 }
 .timeline__item.is-active .timeline__num { color: var(--gold-light); }
 
-.timeline__card h4 {
+.timeline__card h3 {
   text-transform: uppercase; letter-spacing: .1em;
   font-size: 1.05rem; margin-bottom: .8rem;
 }
@@ -948,7 +948,7 @@ p:last-child { margin-bottom: 0; }
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
 .info-tile { padding: clamp(1.5rem, 2.5vw, 2rem); background: var(--white); border: 1px solid var(--line-soft); }
 .info-tile__icon { color: var(--gold-deep); margin-bottom: 1.1rem; }
-.info-tile h4 { text-transform: uppercase; letter-spacing: .12em; font-size: .95rem; font-weight: 500; margin-bottom: .7rem; }
+.info-tile h3 { text-transform: uppercase; letter-spacing: .12em; font-size: .95rem; font-weight: 500; margin-bottom: .7rem; }
 .info-tile p, .info-tile address {
   font-size: .95rem; font-weight: 400; color: var(--ink); font-style: normal; line-height: 1.7;
 }
@@ -1195,7 +1195,7 @@ p:last-child { margin-bottom: 0; }
 
 /* ---------- 9 · FOOTER -------------------------------------------------- */
 .footer { background: var(--espresso-deep); color: rgba(250, 246, 240, .68); padding-top: clamp(3.5rem, 7vw, 6rem); }
-.footer h4, .footer .brand__mark { color: var(--cream); }
+.footer h3, .footer .brand__mark { color: var(--cream); }
 .footer a:hover { color: var(--gold-light); }
 
 .footer__grid {

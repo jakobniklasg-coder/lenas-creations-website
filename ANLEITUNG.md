@@ -372,3 +372,24 @@ lenas-creations/
 
 Es werden keine externen Bibliotheken geladen. Die Website funktioniert ohne
 Internetverbindung zu Dritten und bleibt dadurch dauerhaft wartungsarm.
+
+---
+
+## 14. Sicherheit, Fehlerseite und Anschlüsse (Stand September 2026)
+
+- **Sicherheits-Header** stehen in `.htaccess` (Apache-Webspace) und `_headers`
+  (Cloudflare Pages / Netlify). Beide enthalten dieselben Werte. Wird ein Formulardienst
+  (z. B. Formspree) eingetragen, muss dessen Adresse in beiden Dateien bei `connect-src`
+  und `form-action` ergänzt werden, sonst blockiert der Browser das Absenden.
+- **HTTPS-Umleitung:** in `.htaccess` ganz unten, beim Livegang die fünf Zeilen
+  entkommentieren – erst, wenn das Zertifikat aktiv ist.
+- **404-Seite:** `404.html` wird bei falschen Adressen angezeigt (Apache über
+  `.htaccess`, Cloudflare Pages automatisch).
+- **Online-Buchung:** Solange `bookingUrl` in `js/config.js` leer ist, zeigen Startseite
+  und Kontaktseite die Fassung „Termin anfragen“. Mit Buchungslink erscheinen automatisch
+  die Texte zur Online-Buchung.
+- **Instagram/Facebook:** Symbole und Links bleiben ausgeblendet, bis in `js/config.js`
+  eine echte Profil-Adresse steht (nicht nur `instagram.com/`).
+- **Bilder:** Zu jedem JPG liegt eine WebP-Fassung (kleiner, gleiche Optik). Beim
+  Austausch eines Bildes beide Dateien ersetzen oder die WebP-Datei löschen – dann
+  nimmt der Browser automatisch das JPG.

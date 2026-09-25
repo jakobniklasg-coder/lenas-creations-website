@@ -17,8 +17,13 @@
     var url = (CFG.bookingUrl || "").trim();
     var external = url.length > 0;
 
+    // Ohne Buchungslink: auf der Kontaktseite direkt zum Formular springen,
+    // sonst zeigt der Knopf im Buchungsfeld auf sich selbst
+    var fallback = CFG.bookingFallback || "kontakt.html#anfrage";
+    if (!external && $("[data-form]") && $("#anfrage")) fallback = "#anfrage";
+
     $$("[data-booking]").forEach(function (el) {
-      el.setAttribute("href", external ? url : (CFG.bookingFallback || "kontakt.html#termin"));
+      el.setAttribute("href", external ? url : fallback);
       if (external) {
         el.setAttribute("target", "_blank");
         el.setAttribute("rel", "noopener");
@@ -36,6 +41,9 @@
         ? "Öffnet die Online-Terminbuchung in einem neuen Fenster."
         : "Anfrage über das Formular – Antwort in der Regel innerhalb von 24 Stunden.";
     });
+    // Texte, die echte Online-Buchung versprechen, nur mit Buchungslink zeigen
+    $$("[data-if-booking]").forEach(function (el) { el.hidden = !external; });
+    $$("[data-if-no-booking]").forEach(function (el) { el.hidden = external; });
 
     $$("[data-phone]").forEach(function (el) {
       el.setAttribute("href", "tel:" + (CFG.phoneLink || ""));
@@ -50,8 +58,16 @@
       el.setAttribute("href", "mailto:" + (CFG.email || ""));
       if (el.hasAttribute("data-mail-text")) el.textContent = CFG.email || "";
     });
-    $$("[data-instagram]").forEach(function (el) { el.setAttribute("href", CFG.instagram || "#"); });
-    $$("[data-facebook]").forEach(function (el) { el.setAttribute("href", CFG.facebook || "#"); });
+    // Social-Links nur zeigen, wenn ein echtes Profil eingetragen ist (nicht nur instagram.com)
+    function socialLink(sel, url, ok) {
+      $$(sel).forEach(function (el) {
+        var ziel = el.parentNode && el.parentNode.tagName === "LI" ? el.parentNode : el;
+        if (ok) { el.setAttribute("href", url); ziel.hidden = false; }
+        else { el.removeAttribute("href"); ziel.hidden = true; }
+      });
+    }
+    socialLink("[data-instagram]", CFG.instagram, isInstagramProfile((CFG.instagram || "").trim()));
+    socialLink("[data-facebook]", CFG.facebook, isFacebookProfile((CFG.facebook || "").trim()));
     $$("[data-address]").forEach(function (el) {
       el.innerHTML = (CFG.street || "") + "<br>" + (CFG.zip || "") + " " + (CFG.city || "");
     });
@@ -469,7 +485,10 @@
         window.location.href = "mailto:" + (CFG.email || "") +
           "?subject=" + encodeURIComponent(subject) +
           "&body=" + encodeURIComponent(lines);
-        say("Das E-Mail-Programm wurde geöffnet. Bitte dort noch auf Senden klicken.", true);
+        // Ehrlich bleiben: ob ein E-Mail-Programm eingerichtet ist, wissen wir nicht
+        say("Wenn sich dein E-Mail-Programm geöffnet hat: bitte dort auf Senden klicken. " +
+            "Falls nicht, schreib direkt an " + (CFG.email || "") +
+            (CFG.phone ? " oder ruf an: " + CFG.phone : "") + ".", true);
       }
     });
 
@@ -681,6 +700,15 @@
   /* ----------------------------------------------------------------------
      13 · Instagram-Raster (ohne Embed, nur lokale Bilder + Link)
   ---------------------------------------------------------------------- */
+  function isFacebookProfile(url) {
+    try {
+      var u = new URL(url);
+      return /^https?:$/.test(u.protocol) &&
+             /(^|\.)facebook\.com$/i.test(u.hostname) &&
+             u.pathname.replace(/\//g, "") !== "";
+    } catch (e) { return false; }
+  }
+
   function isInstagramProfile(url) {
     try {
       var u = new URL(url);
